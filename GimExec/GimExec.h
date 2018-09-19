@@ -20,9 +20,11 @@ public:
 	std::vector<cv::Rect> single_detection_people(cv::Mat frame, cv::Rect crop);
 	std::vector<cv::Rect> single_detection_face(cv::Mat frame, cv::Rect crop);
 	cv::Rect netroi2refroi(cv::Rect netroi);
+	cv::Rect netroi2roi(cv::Rect netroi);
 	bool get_dst();
 	bool detect_face(cv::Point current_point);
 	void draw_tracking(cv::Mat ref);
+	void draw_tracking(cv::Mat ref, cv::Mat local);
 	void Thtracking();
 	void Thshoot();
 	void Thshowref();
@@ -41,6 +43,10 @@ public:
 	cv::Mat current_local;
 	cv::Mat current_local_stitch;
 	cv::Mat current_ref_draw;
+	cv::Mat current_local_draw;
+	/////////////////
+	std::vector<cv::Rect> current_people_roi;
+	/////////////////////////
 	std::map<int, cv::Rect> current_tracker;
 	cv::Rect ref_roi;
 	std::vector<cv::Mat> NeedToShow;

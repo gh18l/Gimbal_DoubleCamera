@@ -56,10 +56,10 @@ void GimExec::track_people(cv::Mat ref)
 
 	for (it = temp.begin(); it != temp.end(); it++)
 	{
-		std::cout << "first              " << it->second << std::endl;
+		//std::cout << "first              " << it->second << std::endl;
 		if (it->second.x > 2000 || it->second.y > 1500)
 		{
-			std::cout << "first error !!!!!!!!!!!!!!!!!" << std::endl;
+			//std::cout << "first error !!!!!!!!!!!!!!!!!" << std::endl;
 		}
 	}
 
@@ -74,7 +74,7 @@ void GimExec::track_people(cv::Mat ref)
 	{
 		if (it->second.x > 2000 || it->second.y > 1500)
 		{
-			std::cout << "second error !!!!!!!!!!!!!!!!!" << std::endl;
+			//std::cout << "second error !!!!!!!!!!!!!!!!!" << std::endl;
 		}
 	}
 
@@ -84,11 +84,11 @@ void GimExec::track_people(cv::Mat ref)
 
 cv::Rect GimExec::netroi2refroi(cv::Rect netroi)
 {
-	std::cout << "before              " << netroi << std::endl;
+	//std::cout << "before              " << netroi << std::endl;
 	cv::Rect roi = cv::Rect((float)netroi.x * (float)ref_roi.width / 416.0 + (float)ref_roi.x,
 		(float)netroi.y * (float)ref_roi.height / 416.0 + (float)ref_roi.y, (float)netroi.width * (float)ref_roi.width / 416.0,
 		(float)netroi.height * (float)ref_roi.height / 416.0);
-	std::cout << "after              " << roi << std::endl;
+	//std::cout << "after              " << roi << std::endl;
 	return roi;
 }
 
@@ -98,7 +98,7 @@ void GimExec::draw_tracking(cv::Mat ref)
 	tracker_temp = yolotrackerptr->get_tracker_map();
 	if (tracker_temp.size() != 0)
 	{
-		std::cout << "draw roi size is    " << tracker_temp.size() << std::endl;
+		//std::cout << "~~~~~~~~~~~~~draw roi size is                  " << tracker_temp.size() << std::endl;
 		std::map<int, cv::Rect>::iterator it;
 		it = tracker_temp.begin();
 		char showMsg[10];
@@ -106,17 +106,50 @@ void GimExec::draw_tracking(cv::Mat ref)
 		{
 			int ID = it->first;
 			cv::Rect roi = it->second;
-			std::cout << "draw roi is    " << roi << std::endl;
+			//std::cout << "draw roi is    " << roi << std::endl;
 			cv::rectangle(ref, roi, cv::Scalar(255, 255, 0), 4);
 
 			sprintf(showMsg, "%d", ID);
 			cv::putText(ref, showMsg, cv::Point(roi.x, roi.y), CV_FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(255, 0, 0), 4);
 		}
 #ifdef DEBUG
-		cv::rectangle(ref, ref_roi, cv::Scalar(255, 0, 0), 4);
+	cv::rectangle(ref, ref_roi, cv::Scalar(255, 0, 0), 4);
 #endif
 	}
-	
+}
+
+void GimExec::draw_tracking(cv::Mat ref, cv::Mat local)
+{
+	std::map<int, cv::Rect> tracker_temp;
+	tracker_temp = yolotrackerptr->get_tracker_map();
+	if (tracker_temp.size() != 0)
+	{
+		//std::cout << "~~~~~~~~~~~~~draw roi size is                  " << tracker_temp.size() << std::endl;
+		std::map<int, cv::Rect>::iterator it;
+		it = tracker_temp.begin();
+		char showMsg[10];
+		for (it; it != tracker_temp.end(); it++)
+		{
+			int ID = it->first;
+			cv::Rect roi = it->second;
+			//std::cout << "draw roi is    " << roi << std::endl;
+			cv::rectangle(ref, roi, cv::Scalar(255, 255, 0), 4);
+
+			sprintf(showMsg, "%d", ID);
+			cv::putText(ref, showMsg, cv::Point(roi.x, roi.y), CV_FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(255, 0, 0), 4);
+		}
+#ifdef DEBUG
+	cv::rectangle(ref, ref_roi, cv::Scalar(255, 0, 0), 4);
+	///////ÔÚlocalÉÏ»­///////////////
+	if (current_people_roi.size() != 0)
+	{
+		for (int i = 0; i < current_people_roi.size(); i++)
+		{
+			cv::rectangle(local, current_people_roi[i], cv::Scalar(255, 0, 0), 4);
+		}
+	}
+#endif
+	}
 }
 
 std::vector<cv::Rect> GimExec::single_detection_people(cv::Mat frame, cv::Rect crop)
@@ -183,6 +216,15 @@ bool GimExec::get_dst()
 	return 1;
 }
 
+cv::Rect GimExec::netroi2roi(cv::Rect netroi)
+{
+	cv::Rect roi((float)netroi.x * (float)gimutilptr->video_width / 416.0,
+		(float)netroi.y * (float)gimutilptr->video_height / 416.0,
+		(float)netroi.width * (float)gimutilptr->video_width / 416.0,
+		(float)netroi.height * (float)gimutilptr->video_height / 416.0);
+	return roi;
+}
+
 bool GimExec::detect_face(cv::Point current_point)
 {
 	cv::Mat detect_local;
@@ -193,6 +235,10 @@ bool GimExec::detect_face(cv::Point current_point)
 		IsTracking = 1;
 		people_roi = yolotrackerptr->single_detect_people(detect_local, cv::Rect(0, 0, detect_local.cols,
 			detect_local.rows));
+		for (int i = 0; i < people_roi.size(); i++)
+		{
+			people_roi[i] = netroi2roi(people_roi[i]);
+		}
 		IsTracking = 0;
 	}
 	else
@@ -204,12 +250,17 @@ bool GimExec::detect_face(cv::Point current_point)
 		IsTracking = 1;
 		people_roi = yolotrackerptr->single_detect_people(detect_local, cv::Rect(0, 0, detect_local.cols,
 			detect_local.rows));
+		for (int i = 0; i < people_roi.size(); i++)
+		{
+			people_roi[i] = netroi2roi(people_roi[i]);
+		}
 		IsTracking = 0;
 	}
-	
+
+
 	if (people_roi.size() == 0)
 	{
-		//std::cout << "Cant find any people in local~~~!!!" << std::endl;
+		std::cout << "Cant find any people in local~~~!!!" << std::endl;
 		return 0;
 	}
 
@@ -247,6 +298,11 @@ bool GimExec::detect_face(cv::Point current_point)
 	cv::Rect face(people_roi[index].x, people_roi[index].y,
 		people_roi[index].width, people_roi[index].height / 2);
 
+	//////////////////////////////////
+	current_people_roi.resize(1);
+	current_people_roi[0] = face;
+	////////////////////////////////////
+
 	std::vector<cv::Rect> face_roi;
 	if (IsTracking == 0)
 	{
@@ -264,9 +320,11 @@ bool GimExec::detect_face(cv::Point current_point)
 		face_roi = yolotrackerptr->single_detect_face(detect_local, face);
 		IsTracking = 0;
 	}
+
 	if (face_roi.size() == 0)
 	{
-		//std::cout << "Only have back view~~~!!!" << std::endl;
+		tracked_id.push_back(dst_tracker.first);
+		std::cout << "cant detect any face, only have back view~~~!!!" << std::endl;
 		return 0;
 	}
 	else
@@ -285,6 +343,7 @@ bool GimExec::detect_face(cv::Point current_point)
 			detect_local(face).copyTo(NeedToShow[NeedToShow_index]);
 			NeedToShow_index++;
 		}
+		tracked_id.push_back(dst_tracker.first);
 	}
 	return 1;
 }
@@ -308,11 +367,13 @@ void GimExec::Thtracking()
 	{
 		if (!current_ref.empty())
 		{
-			cv::Mat current_ref_tracking;
+			cv::Mat current_ref_tracking, current_local_tracking;
 			current_ref.copyTo(current_ref_tracking);
+			current_local.copyTo(current_local_tracking);
 			track_people(current_ref_tracking);
-			draw_tracking(current_ref_tracking);
+			draw_tracking(current_ref_tracking, current_local_tracking);
 			current_ref_tracking.copyTo(current_ref_draw);
+			current_local_tracking.copyTo(current_local_draw);
 			if (flag == 99)
 			{
 				start = clock();
@@ -338,13 +399,16 @@ void GimExec::Thshowref()
 {
 	while (1)
 	{
-		if (!current_ref_draw.empty())
+		if (!current_ref_draw.empty() && !current_local_draw.empty())
 		{
-			cv::Mat show;
-			current_ref_draw.copyTo(show);
-			cv::resize(show, show, cv::Size(1200, 1000));
+			cv::Mat show_ref,show_local;
+			current_local_draw.copyTo(show_local);
+			current_ref_draw.copyTo(show_ref);
+			cv::resize(show_ref, show_ref, cv::Size(1200, 1000));
+			cv::resize(show_local, show_local, cv::Size(1200, 1000));
 			
-			cv::imshow("ref", show);
+			cv::imshow("ref", show_ref);
+			cv::imshow("local", show_local);
 			cv::waitKey(1);
 		}
 	}
@@ -394,12 +458,12 @@ void GimExec::Thstart()
 	std::thread Thread1(&GimExec::Thshoot, this);
 	std::thread Thread2(&GimExec::Thtracking, this);
 	std::thread Thread3(&GimExec::Thshowref, this);
-	//std::thread Thread4(&GimExec::Thshowpanorama, this);
+	std::thread Thread4(&GimExec::Thshowpanorama, this);
 	//std::thread Thread5(&GimExec::Thstitch, this);
 	Thread1.detach();
 	Thread2.detach();
 	Thread3.detach();
-	//Thread4.detach();
+	Thread4.detach();
 	//Thread5.detach();
 }
 

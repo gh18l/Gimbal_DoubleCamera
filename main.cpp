@@ -33,8 +33,8 @@ int GimUtil::dX = 1500;
 int GimUtil::X_MIN = 0;
 int GimUtil::dY = 1500;
 int GimUtil::Y_MIN = 0;
-int GimUtil::Row = 6;
-int GimUtil::Col = 6;
+int GimUtil::Row = 8;
+int GimUtil::Col = 9;
 float GimUtil::scale = 0.215;
 
 void init_base()
@@ -195,12 +195,12 @@ void Execute()
 int main(int argc, char* argv[])
 {
 	
-	//init_base();
-	//init_ext(argc);
+	init_base();
+	init_ext(argc);
 	//test_ref2local();
-	//GimUtilPtr->initposition(cv::Point(3000, 0), std::pair<bool, bool>(1, 0)); // 1 1×óÉÏ
+	//GimUtilPtr->initposition(cv::Point(0, 0), std::pair<bool, bool>(1, 0)); // 1 1×óÉÏ
 	//GimUtilPtr->estimate_scale();
-	test_tracking();
+	//test_tracking();
 	//test_serial();
-	//Execute();
+	Execute();
 }
