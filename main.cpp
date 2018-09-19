@@ -33,8 +33,8 @@ int GimUtil::dX = 1500;
 int GimUtil::X_MIN = 0;
 int GimUtil::dY = 1500;
 int GimUtil::Y_MIN = 0;
-int GimUtil::Row = 8;
-int GimUtil::Col = 9;
+int GimUtil::Row = 6;
+int GimUtil::Col = 8;
 float GimUtil::scale = 0.215;
 
 void init_base()
@@ -69,12 +69,12 @@ void init_ext(int argc)
 	GimUtilPtr->video_width = local.cols;
 	GimUtilPtr->video_height = local.rows;
 	GimUtilPtr->find_position(ref, local, GimUtilPtr->current_point);    //update now point
+	std::cout << "init point is      " << GimUtilPtr->current_point << std::endl;
 	if (argc > 1)
 	{
 		//extract panorama and imgs
 		GimPanoPtr->read_panorama();
 		GimUtilPtr->current_pulse = GimUtilPtr->read_pulse();
-		GimUtilPtr->find_position(ref, local, GimUtilPtr->current_point);
 	}
 	else
 	{
@@ -167,6 +167,18 @@ void test_serial()
 	
 }
 
+void test_face()
+{
+	cv::Mat face = cv::imread("E:/data/test_data/HRpeople/0.jpg");
+	cv::Rect roi(0, 0, face.cols, face.rows / 2);
+	std::vector<cv::Rect> faceresult;
+	faceresult = YOLOTrackerPtr->single_detect_face(face, roi);
+	for(int i = 0; i < faceresult.size(); i++)
+		std::cout << faceresult[i] << std::endl;
+	system("pause");
+}
+
+
 void Execute()
 {
 	GimExecPtr->Thstart();
@@ -176,17 +188,32 @@ void Execute()
 		{
 			//update current_pulse and current_point
 			if (GimUtilPtr->move(GimExecPtr->dst_point) == -1)   //不符合move要求
+			{
+				//std::cout << "move error!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
 				continue;
+			}
 			GimUtil::move_delay();
 			//以后可去掉
-
+			cv::Mat find;
+			GimExecPtr->current_ref.copyTo(find);
+			cv::Rect find_before = cv::Rect(GimExecPtr->dst_point,
+				cv::Size(GimUtilPtr->video_width * GimUtil::scale,
+					GimUtilPtr->video_height * GimUtil::scale));
+			cv::rectangle(find, find_before, cv::Scalar(255, 0, 0), 4);
 			GimUtilPtr->gimble_find_position(GimExecPtr->current_ref,
 				GimExecPtr->current_local, GimUtilPtr->current_point, 2,
-					GimUtilPtr->current_point);
+				GimUtilPtr->current_point);
+			cv::Rect find_after = cv::Rect(GimExecPtr->dst_point,
+				cv::Size(GimUtilPtr->video_width * GimUtil::scale,
+					GimUtilPtr->video_height * GimUtil::scale));
+			cv::rectangle(find, find_after, cv::Scalar(0, 0, 255), 4);
+			find.copyTo(GimExecPtr->find_before_after);
 			//push face_img to NeedToShow
-			GimExecPtr->detect_face(GimUtilPtr->current_point); 
+			GimExecPtr->detect_face(GimUtilPtr->current_point);
 			GimUtil::sleep(2000);
 		}
+		else
+			std::cout << "dont have tracker or all error" << std::endl;
 	}
 }
 
@@ -202,5 +229,6 @@ int main(int argc, char* argv[])
 	//GimUtilPtr->estimate_scale();
 	//test_tracking();
 	//test_serial();
+	//test_face();
 	Execute();
 }

@@ -251,10 +251,40 @@ int GimUtil::move(cv::Point dst_point)
 	//std::cout << "current point is             " << current_point << std::endl;
 	cv::Point dst_pulse;
 	dst_pulse = dst2pulse(dst_point);
-	if (dst_pulse.x >= (GimUtil::Col - 1) * GimUtil::dX || dst_pulse.y >= (GimUtil::Row - 1) * GimUtil::dY
+	if (dst_pulse.x >= (GimUtil::Col - 1) * GimUtil::dX)
+	{
+		std::cout << "1" << std::endl;
+		return -1;
+	}
+	if (dst_pulse.y >= (GimUtil::Row - 1) * GimUtil::dY)
+	{
+		std::cout << "2" << std::endl;
+		return -1;
+	}
+	if (dst_point.x > 1900)
+	{
+		std::cout << "3" << std::endl;
+		return -1;
+	}
+	if (dst_point.y > 1400)
+	{
+		std::cout << "4" << std::endl;
+		return -1;
+	}
+	if (dst_pulse.x < 0)
+	{
+		std::cout << "5" << std::endl;
+		return -1;
+	}
+	if (dst_point.y < 0)
+	{
+		std::cout << "6" << std::endl;
+		return -1;
+	}
+	/*if (dst_pulse.x >= (GimUtil::Col - 1) * GimUtil::dX || dst_pulse.y >= (GimUtil::Row - 1) * GimUtil::dY
 		|| dst_point.x > 1900 || dst_point.y > 1400 || dst_pulse.x < 0 || dst_pulse.y < 0 
 		|| dst_point.x < 0 || dst_point.y < 0)
-		return -1;
+		return -1;*/
 	send_pulse(dst_pulse);
 	current_point = dst_point;
 	return 0;

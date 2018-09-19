@@ -21,7 +21,7 @@ float fov = 45.0f;
 bool firstMouse = true;
 Shader ourShader;
 unsigned int VBO, VAO;
-int showSub = 6;
+int showSub = 8;
 std::vector<unsigned int>VAOsub(showSub);
 std::vector<unsigned int>VBOsub(showSub);
 std::vector<unsigned int>texturesub(showSub);
@@ -108,7 +108,7 @@ void Display::GenArray(int x, int y, int w, int h)
 
 int Display::display_init(cv::Mat img)
 {
-	SCR_WIDTH = img.cols / 100 * 100 + 1300;
+	SCR_WIDTH = img.cols / 100 * 100 + 700;
 	SCR_HEIGHT = img.rows / 100 * 100;
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -160,14 +160,14 @@ int Display::display_init(cv::Mat img)
 	glEnableVertexAttribArray(1);
 
 
-	GenArray(SCR_WIDTH - 1250, SCR_HEIGHT - 650, 600, 600);
-	GenArray(SCR_WIDTH - 650, SCR_HEIGHT - 650, 600, 600);
-	GenArray(SCR_WIDTH - 1250, SCR_HEIGHT - 1250, 600, 600);
-	GenArray(SCR_WIDTH - 650, SCR_HEIGHT - 1250, 600, 600);
-	GenArray(SCR_WIDTH - 1250, SCR_HEIGHT - 1850, 600, 600);
-	GenArray(SCR_WIDTH - 650, SCR_HEIGHT - 1850, 600, 600);
-	GenArray(SCR_WIDTH - 1250, SCR_HEIGHT - 2450, 600, 600);
-	GenArray(SCR_WIDTH - 650, SCR_HEIGHT - 2450, 600, 600);
+	GenArray(SCR_WIDTH - 650, SCR_HEIGHT - 350, 300, 300);
+	GenArray(SCR_WIDTH - 350, SCR_HEIGHT - 350, 300, 300);
+	GenArray(SCR_WIDTH - 650, SCR_HEIGHT - 650, 300, 300);
+	GenArray(SCR_WIDTH - 350, SCR_HEIGHT - 650, 300, 300);
+	GenArray(SCR_WIDTH - 650, SCR_HEIGHT - 950, 300, 300);
+	GenArray(SCR_WIDTH - 350, SCR_HEIGHT - 950, 300, 300);
+	GenArray(SCR_WIDTH - 650, SCR_HEIGHT - 1250, 300, 300);
+	GenArray(SCR_WIDTH - 350, SCR_HEIGHT - 1250, 300, 300);
 	//float *vertices1 = GenArray(SCR_WIDTH - 1250, SCR_HEIGHT - 3050, 600, 600);
 	//float *vertices1 = GenArray(SCR_WIDTH - 650, SCR_HEIGHT - 3050, 600, 600);
 	float array_face[8 * 30];
@@ -218,7 +218,7 @@ int Display::display(cv::Mat img, std::vector<cv::Mat> NeedToShow)
 	{
 		cv::Mat temp;
 		NeedToShow[i].copyTo(temp);
-		cv::resize(temp, temp, cv::Size(600, 600));
+		cv::resize(temp, temp, cv::Size(300, 300));
 		glBindTexture(GL_TEXTURE_2D, texturesub[i]);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, temp.cols, temp.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, temp.data);
 

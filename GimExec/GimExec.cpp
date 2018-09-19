@@ -118,40 +118,6 @@ void GimExec::draw_tracking(cv::Mat ref)
 	}
 }
 
-void GimExec::draw_tracking(cv::Mat ref, cv::Mat local)
-{
-	std::map<int, cv::Rect> tracker_temp;
-	tracker_temp = yolotrackerptr->get_tracker_map();
-	if (tracker_temp.size() != 0)
-	{
-		//std::cout << "~~~~~~~~~~~~~draw roi size is                  " << tracker_temp.size() << std::endl;
-		std::map<int, cv::Rect>::iterator it;
-		it = tracker_temp.begin();
-		char showMsg[10];
-		for (it; it != tracker_temp.end(); it++)
-		{
-			int ID = it->first;
-			cv::Rect roi = it->second;
-			//std::cout << "draw roi is    " << roi << std::endl;
-			cv::rectangle(ref, roi, cv::Scalar(255, 255, 0), 4);
-
-			sprintf(showMsg, "%d", ID);
-			cv::putText(ref, showMsg, cv::Point(roi.x, roi.y), CV_FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(255, 0, 0), 4);
-		}
-#ifdef DEBUG
-	cv::rectangle(ref, ref_roi, cv::Scalar(255, 0, 0), 4);
-	///////在local上画///////////////
-	if (current_people_roi.size() != 0)
-	{
-		for (int i = 0; i < current_people_roi.size(); i++)
-		{
-			cv::rectangle(local, current_people_roi[i], cv::Scalar(255, 0, 0), 4);
-		}
-	}
-#endif
-	}
-}
-
 std::vector<cv::Rect> GimExec::single_detection_people(cv::Mat frame, cv::Rect crop)
 {
 	std::vector<cv::Rect> vector;
@@ -169,12 +135,12 @@ std::vector<cv::Rect> GimExec::single_detection_face(cv::Mat frame, cv::Rect cro
 //get dst_point
 bool GimExec::get_dst()
 {
-	std::map<int, cv::Rect> tracker_temp = current_tracker;
-	if (tracker_temp.size() == 0)
+	if (current_tracker.size() == 0)
 	{
 		//std::cout << "we dont detect any person!!!" << std::endl;
 		return 0;
 	}
+	std::map<int, cv::Rect> tracker_temp = current_tracker;
 	cv::Point dst;
 
 	std::map<int, cv::Rect>::iterator it;
@@ -195,6 +161,7 @@ bool GimExec::get_dst()
 	}
 	if (it == tracker_temp.end())   //没找到没跟踪过的，就随机找一个吧
 	{
+		std::cout << "all tracker have been extracted!!!!!!!!!!!!!!" << std::endl;
 		//这里没做任何处理
 		std::map<int, cv::Rect>::iterator it;
 		it = tracker_temp.begin();
@@ -258,11 +225,21 @@ bool GimExec::detect_face(cv::Point current_point)
 	}
 
 
+
 	if (people_roi.size() == 0)
 	{
 		std::cout << "Cant find any people in local~~~!!!" << std::endl;
 		return 0;
 	}
+
+	//////draw//////////////////////////
+	detect_local.copyTo(localdraw);
+	for (int i = 0; i < people_roi.size(); i++)
+	{
+		cv::rectangle(localdraw, people_roi[i], cv::Scalar(0, 0, 255), 4);
+	}
+		
+
 
 	cv::Point relative_point;
 	relative_point = cv::Point(dst_tracker.second.x - current_point.x,
@@ -298,12 +275,12 @@ bool GimExec::detect_face(cv::Point current_point)
 	cv::Rect face(people_roi[index].x, people_roi[index].y,
 		people_roi[index].width, people_roi[index].height / 2);
 
-	//////////////////////////////////
-	current_people_roi.resize(1);
-	current_people_roi[0] = face;
-	////////////////////////////////////
+	////draw  face    /////////////////////
+	cv::rectangle(localdraw, face, cv::Scalar(255, 0, 0), 4);
+	//cv::imshow("local", localdraw);
+	//cv::waitKey(1);
 
-	std::vector<cv::Rect> face_roi;
+	/*std::vector<cv::Rect> face_roi;
 	if (IsTracking == 0)
 	{
 		IsTracking = 1;
@@ -319,34 +296,32 @@ bool GimExec::detect_face(cv::Point current_point)
 		IsTracking = 1;
 		face_roi = yolotrackerptr->single_detect_face(detect_local, face);
 		IsTracking = 0;
-	}
+	}*/
 
-	if (face_roi.size() == 0)
+	/*if (face_roi.size() == 0)
 	{
 		tracked_id.push_back(dst_tracker.first);
 		std::cout << "cant detect any face, only have back view~~~!!!" << std::endl;
 		return 0;
-	}
-	else
+	}*/
+	//在脸部画标号
+	char showMsg[10];
+	sprintf(showMsg, "%d", dst_tracker.first);
+	cv::putText(detect_local(face), showMsg, cv::Point(0, 0), CV_FONT_HERSHEY_SIMPLEX, 0.8,
+		cv::Scalar(255, 0, 0), 4);
+	if(NeedToShow.size() < 6)   //这里的6根据display.cpp里的来
+		NeedToShow.push_back(detect_local(face));
+	if (NeedToShow.size() == 6)
 	{
-		//在脸部画标号
-		char showMsg[10];
-		sprintf(showMsg, "%d", dst_tracker.first);
-		cv::putText(detect_local(face), showMsg, cv::Point(0, 0), CV_FONT_HERSHEY_SIMPLEX, 0.8,
-			cv::Scalar(255, 0, 0), 4);
-		if(NeedToShow.size() < 6)   //这里的6根据display.cpp里的来
-			NeedToShow.push_back(detect_local(face));
-		if (NeedToShow.size() == 6)
-		{
-			if (NeedToShow_index > 5)
-				NeedToShow_index = 0;
-			detect_local(face).copyTo(NeedToShow[NeedToShow_index]);
-			NeedToShow_index++;
-		}
-		tracked_id.push_back(dst_tracker.first);
+		if (NeedToShow_index > 5)
+			NeedToShow_index = 0;
+		detect_local(face).copyTo(NeedToShow[NeedToShow_index]);
+		NeedToShow_index++;
 	}
+	tracked_id.push_back(dst_tracker.first);
 	return 1;
 }
+
 
 void GimExec::Thshoot()
 {
@@ -367,13 +342,11 @@ void GimExec::Thtracking()
 	{
 		if (!current_ref.empty())
 		{
-			cv::Mat current_ref_tracking, current_local_tracking;
+			cv::Mat current_ref_tracking;
 			current_ref.copyTo(current_ref_tracking);
-			current_local.copyTo(current_local_tracking);
 			track_people(current_ref_tracking);
-			draw_tracking(current_ref_tracking, current_local_tracking);
+			draw_tracking(current_ref_tracking);
 			current_ref_tracking.copyTo(current_ref_draw);
-			current_local_tracking.copyTo(current_local_draw);
 			if (flag == 99)
 			{
 				start = clock();
@@ -399,16 +372,18 @@ void GimExec::Thshowref()
 {
 	while (1)
 	{
-		if (!current_ref_draw.empty() && !current_local_draw.empty())
+		if (!current_ref_draw.empty() && !localdraw.empty() && !find_before_after.empty())
 		{
-			cv::Mat show_ref,show_local;
-			current_local_draw.copyTo(show_local);
+			cv::Mat show_ref, show_local, show_find_ref;
 			current_ref_draw.copyTo(show_ref);
+			localdraw.copyTo(show_local);
+			find_before_after.copyTo(show_find_ref);
 			cv::resize(show_ref, show_ref, cv::Size(1200, 1000));
 			cv::resize(show_local, show_local, cv::Size(1200, 1000));
-			
+			cv::resize(show_find_ref, show_find_ref, cv::Size(1200, 1000));
 			cv::imshow("ref", show_ref);
 			cv::imshow("local", show_local);
+			cv::imshow("find", show_find_ref);
 			cv::waitKey(1);
 		}
 	}
@@ -417,7 +392,7 @@ void GimExec::Thshowref()
 
 void GimExec::Thshowpanorama()
 {
-	cv::Mat black = cv::Mat::zeros(600, 600, CV_8UC3);
+	cv::Mat black = cv::Mat::zeros(300, 300, CV_8UC3);
 	std::vector<cv::Mat> blackvec;
 	blackvec.push_back(black);
 	displayptr->display_init(gimpanoptr->current_panorama);
