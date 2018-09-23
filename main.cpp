@@ -34,7 +34,7 @@ int GimUtil::X_MIN = 0;
 int GimUtil::dY = 1500;
 int GimUtil::Y_MIN = 0;
 int GimUtil::Row = 6;
-int GimUtil::Col = 8;
+int GimUtil::Col = 7;
 float GimUtil::scale = 0.215;
 
 void init_base()
@@ -79,14 +79,15 @@ void init_ext(int argc)
 	else
 	{
 		//generate panorama and save it, generate imgs and save it, save parameters and features
-		GimUtilPtr->current_pulse.x = (GimUtilPtr->current_point.x - 20) * GimUtilPtr->pulse_per_pixel;
-		GimUtilPtr->current_pulse.y = (GimUtilPtr->current_point.y - 15) * GimUtilPtr->pulse_per_pixel;    //得到这个以便生成全景图时
+		GimUtilPtr->current_pulse.x = (GimUtilPtr->current_point.x - 200) * GimUtilPtr->pulse_per_pixel;
+		GimUtilPtr->current_pulse.y = (GimUtilPtr->current_point.y - 150) * GimUtilPtr->pulse_per_pixel;    //得到这个以便生成全景图时
 		GimPanoPtr->get_panorama();
 	}
 	//extract cameras, corners, sizes
 	GimPanoPtr->read_para();
 	//extract features
 	GimPanoPtr->read_features();
+	GimUtilPtr->read_point_connection_pulse_para();
 	GimExecPtr->ref_roi = cv::Rect(ref.cols / 4, ref.rows / 4, ref.cols / 2, ref.rows / 2);
 	GimExecPtr->track_init(ref(GimExecPtr->ref_roi));
 	//init picture parameters
@@ -149,13 +150,21 @@ void test_tracking()
 void test_serial()
 {
 	cv::Mat ref, local;
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 10; i++)
 	{
-		GimUtilPtr->send_pulse(cv::Point(1000, 1000), std::pair<bool, bool>(0, 1));
+		GimUtilPtr->send_pulse(cv::Point(2000, 2000), std::pair<bool, bool>(1, 1));
 		GimUtil::move_delay();
 		GimCameraPtr->shoot(ref, local);
-		cv::imwrite(cv::format("E:/data/test_data/%d.jpg", i), local);
-		cv::imwrite(cv::format("E:/data/test_data/%d_ref.jpg", i), ref);
+		cv::imwrite(cv::format("E:/data/test_data/pulse_correct_test/%d.jpg", i), local);
+		cv::imwrite(cv::format("E:/data/test_data/pulse_correct_test/%d_ref.jpg", i), ref);
+	}
+	for (int i = 0; i < 10; i++)
+	{
+		GimUtilPtr->send_pulse(cv::Point(2000, 2000), std::pair<bool, bool>(0, 0));
+		GimUtil::move_delay();
+		GimCameraPtr->shoot(ref, local);
+		cv::imwrite(cv::format("E:/data/test_data/pulse_correct_test/inv%d.jpg", i), local);
+		cv::imwrite(cv::format("E:/data/test_data/pulse_correct_test/inv%d_ref.jpg", i), ref);
 	}
 	//for (int i = 0; i < 10; i++)
 	//{
@@ -196,14 +205,15 @@ void Execute()
 			//以后可去掉
 			cv::Mat find;
 			GimExecPtr->current_ref.copyTo(find);
-			cv::Rect find_before = cv::Rect(GimExecPtr->dst_point,
+			GimExecPtr->current_local.copyTo(GimExecPtr->localdraw);
+			cv::Rect find_before = cv::Rect(GimUtilPtr->current_point,
 				cv::Size(GimUtilPtr->video_width * GimUtil::scale,
 					GimUtilPtr->video_height * GimUtil::scale));
 			cv::rectangle(find, find_before, cv::Scalar(255, 0, 0), 4);
-			GimUtilPtr->gimble_find_position(GimExecPtr->current_ref,
-				GimExecPtr->current_local, GimUtilPtr->current_point, 2,
-				GimUtilPtr->current_point);
-			cv::Rect find_after = cv::Rect(GimExecPtr->dst_point,
+			//GimUtilPtr->gimble_find_position(GimExecPtr->current_ref,
+				//GimExecPtr->current_local, GimUtilPtr->current_point, 2,
+				//GimUtilPtr->current_point);
+			cv::Rect find_after = cv::Rect(GimUtilPtr->current_point,
 				cv::Size(GimUtilPtr->video_width * GimUtil::scale,
 					GimUtilPtr->video_height * GimUtil::scale));
 			cv::rectangle(find, find_after, cv::Scalar(0, 0, 255), 4);
@@ -221,11 +231,10 @@ void Execute()
 
 int main(int argc, char* argv[])
 {
-	
 	init_base();
 	init_ext(argc);
 	//test_ref2local();
-	//GimUtilPtr->initposition(cv::Point(0, 0), std::pair<bool, bool>(1, 0)); // 1 1左上
+	//GimUtilPtr->initposition(cv::Point(0, 0), std::pair<bool, bool>(0, 0)); // 1 1左上
 	//GimUtilPtr->estimate_scale();
 	//test_tracking();
 	//test_serial();

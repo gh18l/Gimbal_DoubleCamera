@@ -109,8 +109,10 @@ void GimExec::draw_tracking(cv::Mat ref)
 			//std::cout << "draw roi is    " << roi << std::endl;
 			cv::rectangle(ref, roi, cv::Scalar(255, 255, 0), 4);
 
-			sprintf(showMsg, "%d", ID);
-			cv::putText(ref, showMsg, cv::Point(roi.x, roi.y), CV_FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(255, 0, 0), 4);
+			std::string text = std::to_string(ID);
+			int baseline;
+			cv::Size text_size = cv::getTextSize(text, CV_FONT_HERSHEY_SIMPLEX, 1, 2, &baseline);
+			cv::putText(ref, text, cv::Point(0, text_size.height), CV_FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(255, 255, 0), 2);
 		}
 #ifdef DEBUG
 	cv::rectangle(ref, ref_roi, cv::Scalar(255, 0, 0), 4);
@@ -232,14 +234,6 @@ bool GimExec::detect_face(cv::Point current_point)
 		return 0;
 	}
 
-	//////draw//////////////////////////
-	detect_local.copyTo(localdraw);
-	for (int i = 0; i < people_roi.size(); i++)
-	{
-		cv::rectangle(localdraw, people_roi[i], cv::Scalar(0, 0, 255), 4);
-	}
-		
-
 
 	cv::Point relative_point;
 	relative_point = cv::Point(dst_tracker.second.x - current_point.x,
@@ -275,8 +269,6 @@ bool GimExec::detect_face(cv::Point current_point)
 	cv::Rect face(people_roi[index].x, people_roi[index].y,
 		people_roi[index].width, people_roi[index].height / 2);
 
-	////draw  face    /////////////////////
-	cv::rectangle(localdraw, face, cv::Scalar(255, 0, 0), 4);
 	//cv::imshow("local", localdraw);
 	//cv::waitKey(1);
 

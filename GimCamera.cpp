@@ -11,7 +11,7 @@ void GimCamera::init()
 	cameraPtr->startCapture();
 	cameraPtr->setFPS(-1, 20);
 	cameraPtr->setAutoExposure(-1, cam::Status::on);
-	cameraPtr->setAutoExposureLevel(-1, 35);
+	cameraPtr->setAutoExposureLevel(-1, 30);
 	cameraPtr->setAutoWhiteBalance(-1);
 	cameraPtr->makeSetEffective();
 	// set capturing setting

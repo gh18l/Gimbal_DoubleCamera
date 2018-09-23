@@ -48,6 +48,7 @@ public:
 	int warp(cv::Mat src);
 	int read_features();
 	void read_panorama();
+	void save_point_connection_pulse_para(std::vector<std::pair<cv::Point, cv::Point>> point_and_pulse);
 };
 
 #endif

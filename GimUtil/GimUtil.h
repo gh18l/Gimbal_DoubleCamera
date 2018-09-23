@@ -6,6 +6,7 @@
 #include <chrono>
 #include <memory>
 #include <thread>
+#include <math.h>
 #ifdef WIN32
 #include <Windows.h>
 #endif
@@ -16,8 +17,6 @@
 #include <opencv2/opencv.hpp>
 #include "Serial.h"  
 #include "GimCamera.hpp"
-#define PM 6200
-#define YM 3900
 
 class GimUtil{
 public:
@@ -40,6 +39,7 @@ public:
 	void estimate_scale();
 	void write_pulse(cv::Point current_pulse);
 	cv::Point read_pulse();
+	void read_point_connection_pulse_para();
 public:
     static int dX, X_MIN, dY, Y_MIN;
 	static int Row;
@@ -48,6 +48,8 @@ public:
 	cv::Point current_pulse;
     cv::Size sizeBlock;
 	int pulse_per_pixel;
+	std::vector<std::vector<cv::Point>> quad_position;
+	std::vector<std::vector<cv::Point>> quad_pulse_value;
 public:
     cv::Ptr<cv::ximgproc::StructuredEdgeDetection> ptr;
     static float scale;

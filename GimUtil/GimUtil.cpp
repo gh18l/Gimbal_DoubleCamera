@@ -18,7 +18,7 @@ int GimUtil::sleep(int miliseconds)
 
 void GimUtil::move_delay()
 {
-	sleep(700);
+	sleep(1000);
 }
 
 bool GimUtil::isInside(cv::Point2f pt, cv::Rect rect) {
@@ -233,14 +233,79 @@ void GimUtil::send_pulse(cv::Point dst_pulse)   //send absolute pulse,完毕后�
 	write_pulse(current_pulse);
 }
 
+//cv::Point GimUtil::dst2pulse(cv::Point dst)
+//{
+//	cv::Point pulse;
+//	//暂时做一个平均
+//	cv::Point delta_point = cv::Point(dst.x - current_point.x,
+//		dst.y - current_point.y);
+//	pulse = cv::Point(delta_point.x * pulse_per_pixel + current_pulse.x,
+//		delta_point.y * pulse_per_pixel + current_pulse.y);
+//	return pulse;
+//}
+
 cv::Point GimUtil::dst2pulse(cv::Point dst)
 {
-	cv::Point pulse;
-	//暂时做一个平均
-	cv::Point delta_point = cv::Point(dst.x - current_point.x,
-		dst.y - current_point.y);
-	pulse = cv::Point(delta_point.x * pulse_per_pixel + current_pulse.x,
-		delta_point.y * pulse_per_pixel + current_pulse.y);
+	double min_area = 9999.0;
+	int index = 0;
+	for (int i = 0; i < quad_position.size(); i++)
+	{
+		double area = cv::contourArea(quad_position[i]);
+		std::vector<cv::Point> point(3);
+		point[0] = dst;
+		point[1] = (quad_position[i])[0];
+		point[2] = (quad_position[i])[1];
+		double area0 = cv::contourArea(point);
+		point[0] = dst;
+		point[1] = (quad_position[i])[1];
+		point[2] = (quad_position[i])[2];
+		double area1 = cv::contourArea(point);
+		point[0] = dst;
+		point[1] = (quad_position[i])[2];
+		point[2] = (quad_position[i])[3];
+		double area2 = cv::contourArea(point);
+		point[0] = dst;
+		point[1] = (quad_position[i])[3];
+		point[2] = (quad_position[i])[0];
+		double area3 = cv::contourArea(point);
+		double delta_area = std::fabs(area - area0 - area1 - area2 - area3);
+		if (delta_area < min_area)
+		{
+			min_area = delta_area;
+			index = i;
+		}
+	}
+	//bilinear interpolation
+	float up_ratio = ((float)dst.x - (float)(quad_position[index])[0].x) / ((float)(quad_position[index])[1].x - (float)(quad_position[index])[0].x);
+	float down_ratio = ((float)dst.x - (float)(quad_position[index])[2].x) / ((float)(quad_position[index])[3].x - (float)(quad_position[index])[2].x);
+	float up_y = up_ratio * ( (float)(quad_position[index])[0].y - (float)(quad_position[index])[1].y );
+	up_y = (float)(quad_position[index])[0].y - up_y;
+	float down_y = down_ratio * ((float)(quad_position[index])[3].y - (float)(quad_position[index])[2].y);
+	down_y = (float)(quad_position[index])[2].y + down_y;
+
+	float up_pulse_x = (float)(quad_pulse_value[index])[1].x - (float)(quad_pulse_value[index])[0].x;
+	up_pulse_x = up_pulse_x * up_ratio;
+	up_pulse_x = up_pulse_x + (float)(quad_pulse_value[index])[0].x;
+
+	float up_pulse_y = (float)(quad_pulse_value[index])[1].y - (float)(quad_pulse_value[index])[0].y;
+	up_pulse_y = up_pulse_y * up_ratio;
+	up_pulse_y = up_pulse_y + (float)(quad_pulse_value[index])[0].y;
+
+	float down_pulse_x = (float)(quad_pulse_value[index])[3].x - (float)(quad_pulse_value[index])[2].x;
+	down_pulse_x = down_pulse_x * down_ratio;
+	down_pulse_x = down_pulse_x + (float)(quad_pulse_value[index])[0].x;
+
+	float down_pulse_y = (float)(quad_pulse_value[index])[3].y - (float)(quad_pulse_value[index])[2].y;
+	down_pulse_y = down_pulse_y * down_ratio;
+	down_pulse_y = down_pulse_y + (float)(quad_pulse_value[index])[0].y;
+
+	float y_ratio = ((float)dst.y - up_y) / (down_y - up_y);
+
+	float pulse_x = (down_pulse_x - down_pulse_x) * y_ratio + up_pulse_x;
+	float pulse_y = (down_pulse_y - down_pulse_y) * y_ratio + up_pulse_y;
+
+	cv::Point pulse((int)pulse_x, (int)pulse_y);
+
 	return pulse;
 
 }
@@ -357,4 +422,45 @@ cv::Point GimUtil::read_pulse()
 	pulse.close();
 
 	return current_pulse;
+}
+
+void GimUtil::read_point_connection_pulse_para()
+{
+	std::ifstream file;
+	file.open(cv::format("%s/point_connection_pulse.txt", GimUtil::datapath.c_str()), std::ios::in);
+	if (!file.is_open())
+		std::cout << "open file failed" << std::endl;
+
+	std::string str;
+	for (int i = 0; i < (Row - 1) * (Col - 1); i++)
+	{
+		std::vector<cv::Point> vertices;
+		for (int j = 0; j < 4; j++)
+		{
+			cv::Point vertex;
+			std::getline(file, str, '#');
+			vertex.x = std::stoi(str);
+			std::getline(file, str, '#');
+			vertex.y = std::stoi(str);
+			vertices.push_back(vertex);
+		}
+		quad_position.push_back(vertices);
+		std::getline(file, str, ' ');
+	}
+	for (int i = 0; i < (Row - 1) * (Col - 1); i++)
+	{
+		std::vector<cv::Point> pulse_values;
+		for (int j = 0; j < 4; j++)
+		{
+			cv::Point pulse_value;
+			std::getline(file, str, '#');
+			pulse_value.x = std::stoi(str);
+			std::getline(file, str, '#');
+			pulse_value.y = std::stoi(str);
+			pulse_values.push_back(pulse_value);
+		}
+		quad_pulse_value.push_back(pulse_values);
+		std::getline(file, str, ' ');
+	}
+	file.close();
 }

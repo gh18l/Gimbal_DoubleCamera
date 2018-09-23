@@ -259,11 +259,61 @@ void GimPano::get_panorama()
 	save_para(compositor.cameras, compositor.corners, compositor.sizes);
 }
 
+void GimPano::save_point_connection_pulse_para(std::vector<std::pair<cv::Point, cv::Point>> point_and_pulse)
+{
+	//convert vector to quadrilateral
+	std::vector<std::vector<cv::Point>> quad_point;
+	std::vector<std::vector<cv::Point>> quad_pulse;
+	for (int i = 0; i < Row - 1; i++)
+	{
+		for (int j = 0; j < Col - 1; j++)
+		{
+			std::vector<cv::Point> point;
+			std::vector<cv::Point> pulse;
+			point.push_back(point_and_pulse[j + i * Col].first);
+			point.push_back(point_and_pulse[j + i * Col + 1].first);
+			point.push_back(point_and_pulse[j + (i + 1) * Col].first);
+			point.push_back(point_and_pulse[j + (i + 1) * Col + 1].first);
+			quad_point.push_back(point);
+			pulse.push_back(point_and_pulse[j + i * Col].second);
+			pulse.push_back(point_and_pulse[j + i * Col + 1].second);
+			pulse.push_back(point_and_pulse[j + (i + 1) * Col].second);
+			pulse.push_back(point_and_pulse[j + (i + 1) * Col + 1].second);
+			quad_pulse.push_back(pulse);
+		}
+	}
+
+	std::ofstream file;
+	file.open(cv::format("%s/point_connection_pulse.txt", GimUtil::datapath.c_str()), std::ios::out);
+
+	for (int i = 0; i < quad_point.size(); i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			file << (quad_point[i])[j].x << '#';
+			file << (quad_point[i])[j].y << '#';
+		}
+		file << std::endl;
+	}
+	for (int i = 0; i < quad_pulse.size(); i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			file << (quad_pulse[i])[j].x << '#';
+			file << (quad_pulse[i])[j].y << '#';
+		}
+		file << std::endl;
+	}
+	file.close();
+}
+
 void GimPano::collection()
 {
 	cv::Mat ref, local;
-	cv::Mat pulse_pixel(ref.rows, ref.cols, CV_16UC2, cv::Scalar::all(1));
+	cv::Mat pulse_pixel(gimutil_ptr->video_height, gimutil_ptr->video_width, CV_8UC3, cv::Scalar::all(0));
 	cv::Point set_init_pulse;
+	std::vector<std::pair<cv::Point, cv::Point>> point_and_pulse;
+	point_and_pulse.resize(Row * Col);
 	for (int i = 0; i < Row; i++)    //固定从脉冲点0 0开始收集
 	{
 		if (i % 2 == 0)
@@ -285,14 +335,22 @@ void GimPano::collection()
 					GimUtil::datapath.c_str(), dX * j, dY * i), local);
 				if (i == Row / 2 && j == Col / 2)
 					set_init_pulse = cv::Point(dX * j, dY * i);
+
 				//存下来之后再去找，这个为之后的pixel2pulse插值做准备
-				/*cv::Point now_point;
+				cv::Point now_point;
 				gimutil_ptr->find_position(ref, local, 
 					now_point);
-				pulse_pixel.at<cv::Vec2i>(now_point.x,
-					now_point.y)[0] = gimutil_ptr->current_pulse.x;
-				pulse_pixel.at<cv::Vec2i>(now_point.x,
-					now_point.y)[1] = gimutil_ptr->current_pulse.y;*/
+				cv::Rect roi(now_point, cv::Size(ref.cols * GimUtil::scale, ref.rows * GimUtil::scale));
+				//仅供live watch   
+				pulse_pixel.at<cv::Vec3b>(now_point.y,
+					now_point.x)[0] = 0;
+				pulse_pixel.at<cv::Vec3b>(now_point.y,
+					now_point.x)[1] = 0;
+				pulse_pixel.at<cv::Vec3b>(now_point.y,
+					now_point.x)[2] = 255;
+				//正经存
+				point_and_pulse[j + Col * i] = std::pair<cv::Point, cv::Point>(now_point,
+					gimutil_ptr->current_pulse);
 			}
 		}
 
@@ -316,25 +374,35 @@ void GimPano::collection()
 				if (i == Row / 2 && j == Col / 2)
 					set_init_pulse = cv::Point(dX * j, dY * i);
 				//存下来之后再去找
-				/*cv::Point now_point;
+				cv::Point now_point;
 				gimutil_ptr->find_position(ref, local,
 					now_point);
-				pulse_pixel.at<cv::Vec2i>(now_point.x,
-					now_point.y)[0] = gimutil_ptr->current_pulse.x;
-				pulse_pixel.at<cv::Vec2i>(now_point.x,
-					now_point.y)[1] = gimutil_ptr->current_pulse.y;*/
+				cv::Rect roi(now_point, cv::Size(ref.cols * GimUtil::scale, ref.rows * GimUtil::scale));
+				
+				//仅供live watch
+				pulse_pixel.at<cv::Vec3b>(now_point.y,
+					now_point.x)[0] = 0;
+				pulse_pixel.at<cv::Vec3b>(now_point.y,
+					now_point.x)[1] = 0;
+				pulse_pixel.at<cv::Vec3b>(now_point.y,
+					now_point.x)[2] = 255;
+				//正经存
+				point_and_pulse[j + Col * i] = std::pair<cv::Point, cv::Point>(now_point,
+					gimutil_ptr->current_pulse);
 			}
 		}
 	}
-	/*cv::imwrite(cv::format("%s/pulse_pixel.png", GimUtil::datapath.c_str()), pulse_pixel);
-	pulse_pixel.copyTo(pulse_pixel_param);*/
-
+	cv::imwrite(cv::format("%s/pulse_pixel.png", GimUtil::datapath.c_str()), pulse_pixel);
+	save_point_connection_pulse_para(point_and_pulse);
 	//回归
 	gimutil_ptr->send_pulse(set_init_pulse);
 	GimUtil::move_delay();
 	gimcamera_ptr->shoot(ref, local);
 	gimutil_ptr->find_position(ref, local, gimutil_ptr->current_point);
 }
+
+
+
 
 int GimPano::warp(cv::Mat src)
 {
@@ -346,7 +414,7 @@ int GimPano::warp(cv::Mat src)
 	cv::Mat src_warped, mask, mask_warped;
 	cv::Point corner_current;
 	cv::Size size_current;
-	w->setScale(80000);
+	w->setScale(35000);
 	// calculate warping filed
 	cv::Mat K, R;
 	current_para.K().convertTo(K, CV_32F);

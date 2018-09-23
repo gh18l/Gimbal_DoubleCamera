@@ -42,7 +42,7 @@ int calib::Compositor::composite(cv::Mat& panorama) {
 	imgMask.resize(imgs.size());
 	warpMaps.resize(imgs.size());
 	backwarpMaps.resize(imgs.size());
-	w->setScale(80000);
+	w->setScale(35000);
 	for (int i = 0; i < imgs.size(); i++) {
 		// calculate warping filed
 		cv::Mat K, R;
@@ -80,7 +80,7 @@ int calib::Compositor::single_composite(calib::CameraParams& current_camera, cv:
 	cv::Mat imgMask;
 	cv::Ptr<cv::detail::SphericalWarper> w = cv::makePtr<cv::detail::SphericalWarper>(false);
 	std::shared_ptr<cv::detail::Blender> blender_ = std::make_shared<cv::detail::MultiBandBlender>(false);
-	w->setScale(80000);
+	w->setScale(35000);
 
 	cv::Mat K, R;
 	current_camera.K().convertTo(K, CV_32F);
