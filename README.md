@@ -41,7 +41,9 @@ Implement the following measures for real-time system:
 You need import the folder of STM32 into the compiling tools [Keil-v5](https://www.keil.com/), and write the code with [J-link](https://www.segger.com/products/debug-probes/j-link/) into the STM32 microcontroller, which is only responsible for sending pulses and receiving feedback.
 
 ### Pre-compiled C++ library
-In order to run the system, you need the installation of Opencv with CUDA and CUDA package(for basis), ceres-solver and eigen3(for fast BundleAdjustment), OpenGL(for display), XIMEA or PointGray driven(for enabling camera).
+In order to run the system, you need the installation of Opencv with CUDA and CUDA package(for basis), ceres-solver and eigen3(for fast BundleAdjustment), OpenGL(for display), XIMEA or PointGray driven(for enabling camera). 
+
+It is easy to check and compile according to the CMakeLists.txt.
 
 ## Demo
 A coarse but worked real-time demo is in **"demo/output.avi"**, there are some problems with online playback temporarily.
