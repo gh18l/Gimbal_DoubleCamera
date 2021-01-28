@@ -1,7 +1,7 @@
 /**
 @brief YOLODetector.hpp
 YOLO detector GPU cuda version
-@author Shane Yuan
+@thanks for the original version of Shane Yuan 
 @date Nov 4, 2017
 */
 

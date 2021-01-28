@@ -1,7 +1,7 @@
 /**
 @brief CameraParamEstimator.h
 C++ head file for camera parameter estimation
-@author Shane Yuan
+@thanks for the original version of Shane Yuan 
 @date Feb 8, 2018
 */
 

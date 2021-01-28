@@ -1,7 +1,7 @@
 /**
 @brief FeatureMatch.h
 C++ source file for feature matching
-@author Shane Yuan
+@thanks for the original version of Shane Yuan 
 @date Jan 30, 2018
 */
 
@@ -434,7 +434,7 @@ void calib::FeatureMatch::current_feature_thread_(cv::Mat& src, calib::Imagefeat
 	cv::cuda::GpuMat des1, des2;
 	// upload descriptors
 	des1.upload(current_feature.des);
-	des2.upload(feature.des);     //±íÊ¾Ã¿ÕÅÍ¼ÏñµÄÌØÕ÷ÃèÊö¾ØÕó£¬Ã¿¸öÌØÕ÷ÓÐ128Î¬£¬Ò»ÕÅÍ¼Ïñn¸öÌØÕ÷
+	des2.upload(feature.des);     //ï¿½ï¿½Ê¾Ã¿ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½128Î¬ï¿½ï¿½Ò»ï¿½ï¿½Í¼ï¿½ï¿½nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 										  // init l1 descriptor matcher
 
 	cv::Ptr<cv::cuda::DescriptorMatcher> matcher =
@@ -444,14 +444,14 @@ void calib::FeatureMatch::current_feature_thread_(cv::Mat& src, calib::Imagefeat
 	std::vector< std::vector<cv::DMatch> > pair_matches;
 	// find 1->2 matches
 	pair_matches.clear();
-	matcher->knnMatch(des1, des2, pair_matches, 2);   //pair_matchesÊÇÁ½ÕÅÍ¼Æ¬µÄÌØÕ÷Æ¥Åä¶Ô
+	matcher->knnMatch(des1, des2, pair_matches, 2);   //pair_matchesï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼Æ¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¥ï¿½ï¿½ï¿½
 	for (size_t i = 0; i < pair_matches.size(); ++i) {
 		if (pair_matches[i].size() < 2)
 			continue;
 		const cv::DMatch& m0 = pair_matches[i][0];
-		const cv::DMatch& m1 = pair_matches[i][1];    //·Ö±ð±íÊ¾ÖÃÐÅ¶È°´ÐòÅÅÁÐµÄÒ»´ÎÌØÕ÷Æ¥Åä
+		const cv::DMatch& m1 = pair_matches[i][1];    //ï¿½Ö±ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½Å¶È°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¥ï¿½ï¿½
 		if (m0.distance < (1.f - matchConf) * m1.distance) {
-			matchesinfo.matches.push_back(m0);     //ÐÅÈÎ±¾´ÎÌØÕ÷Æ¥Åä
+			matchesinfo.matches.push_back(m0);     //ï¿½ï¿½ï¿½Î±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¥ï¿½ï¿½
 			matches.insert(std::make_pair(m0.queryIdx, m0.trainIdx));
 		}
 	}
@@ -551,7 +551,7 @@ void calib::FeatureMatch::current_feature_thread_(cv::Mat& src, calib::Imagefeat
 	}
 }
 
-int calib::FeatureMatch::global2pano(cv::Mat global, cv::Mat pano)       //¸ù¾ÝÀàÖÐµÄµ±Ç°µãºÍµ±Ç°Âö³åÊ¹ÔÆÌ¨ÒÆ¶¯µ½Ä¿±êÏñËØÎ»ÖÃ
+int calib::FeatureMatch::global2pano(cv::Mat global, cv::Mat pano)       //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÐµÄµï¿½Ç°ï¿½ï¿½Íµï¿½Ç°ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½Ì¨ï¿½Æ¶ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
 {
 	calib::Imagefeature global_feature,pano_feature;
 	cv::Size size = global.size();
@@ -612,7 +612,7 @@ int calib::FeatureMatch::global2pano(cv::Mat global, cv::Mat pano)       //¸ù¾ÝÀ
 	cv::cuda::GpuMat des1, des2;
 	// upload descriptors
 	des1.upload(global_feature.des);
-	des2.upload(pano_feature.des);     //±íÊ¾Ã¿ÕÅÍ¼ÏñµÄÌØÕ÷ÃèÊö¾ØÕó£¬Ã¿¸öÌØÕ÷ÓÐ128Î¬£¬Ò»ÕÅÍ¼Ïñn¸öÌØÕ÷
+	des2.upload(pano_feature.des);     //ï¿½ï¿½Ê¾Ã¿ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½128Î¬ï¿½ï¿½Ò»ï¿½ï¿½Í¼ï¿½ï¿½nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 								  // init l1 descriptor matcher
 	cv::Ptr<cv::cuda::DescriptorMatcher> matcher =
 		cv::cuda::DescriptorMatcher::createBFMatcher(cv::NORM_L1);
@@ -621,14 +621,14 @@ int calib::FeatureMatch::global2pano(cv::Mat global, cv::Mat pano)       //¸ù¾ÝÀ
 	std::vector< std::vector<cv::DMatch> > pair_matches;
 	// find 1->2 matches
 	pair_matches.clear();
-	matcher->knnMatch(des1, des2, pair_matches, 2);   //pair_matchesÊÇÁ½ÕÅÍ¼Æ¬µÄÌØÕ÷Æ¥Åä¶Ô
+	matcher->knnMatch(des1, des2, pair_matches, 2);   //pair_matchesï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼Æ¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¥ï¿½ï¿½ï¿½
 	for (size_t i = 0; i < pair_matches.size(); ++i) {
 		if (pair_matches[i].size() < 2)
 			continue;
 		const cv::DMatch& m0 = pair_matches[i][0];
-		const cv::DMatch& m1 = pair_matches[i][1];    //·Ö±ð±íÊ¾ÖÃÐÅ¶È°´ÐòÅÅÁÐµÄÒ»´ÎÌØÕ÷Æ¥Åä
+		const cv::DMatch& m1 = pair_matches[i][1];    //ï¿½Ö±ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½Å¶È°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¥ï¿½ï¿½
 		if (m0.distance < (1.f - matchConf) * m1.distance) {
-			matchesinfo.matches.push_back(m0);     //ÐÅÈÎ±¾´ÎÌØÕ÷Æ¥Åä
+			matchesinfo.matches.push_back(m0);     //ï¿½ï¿½ï¿½Î±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¥ï¿½ï¿½
 			matches.insert(std::make_pair(m0.queryIdx, m0.trainIdx));
 		}
 	}
@@ -943,7 +943,7 @@ double calib::FeatureMatch::match_people(cv::Mat img1, cv::Mat img2)
 	cv::cuda::GpuMat des1, des2;
 	// upload descriptors
 	des1.upload(img1_feature.des);
-	des2.upload(img2_feature.des);     //±íÊ¾Ã¿ÕÅÍ¼ÏñµÄÌØÕ÷ÃèÊö¾ØÕó£¬Ã¿¸öÌØÕ÷ÓÐ128Î¬£¬Ò»ÕÅÍ¼Ïñn¸öÌØÕ÷
+	des2.upload(img2_feature.des);     //ï¿½ï¿½Ê¾Ã¿ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½128Î¬ï¿½ï¿½Ò»ï¿½ï¿½Í¼ï¿½ï¿½nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 									   // init l1 descriptor matcher
 	cv::Ptr<cv::cuda::DescriptorMatcher> matcher =
 		cv::cuda::DescriptorMatcher::createBFMatcher(cv::NORM_L1);
@@ -952,14 +952,14 @@ double calib::FeatureMatch::match_people(cv::Mat img1, cv::Mat img2)
 	std::vector< std::vector<cv::DMatch> > pair_matches;
 	// find 1->2 matches
 	pair_matches.clear();
-	matcher->knnMatch(des1, des2, pair_matches, 2);   //pair_matchesÊÇÁ½ÕÅÍ¼Æ¬µÄÌØÕ÷Æ¥Åä¶Ô
+	matcher->knnMatch(des1, des2, pair_matches, 2);   //pair_matchesï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼Æ¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¥ï¿½ï¿½ï¿½
 	for (size_t i = 0; i < pair_matches.size(); ++i) {
 		if (pair_matches[i].size() < 2)
 			continue;
 		const cv::DMatch& m0 = pair_matches[i][0];
-		const cv::DMatch& m1 = pair_matches[i][1];    //·Ö±ð±íÊ¾ÖÃÐÅ¶È°´ÐòÅÅÁÐµÄÒ»´ÎÌØÕ÷Æ¥Åä
+		const cv::DMatch& m1 = pair_matches[i][1];    //ï¿½Ö±ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½Å¶È°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¥ï¿½ï¿½
 		if (m0.distance < (1.f - 0.1) * m1.distance) {
-			matchesinfo.matches.push_back(m0);     //ÐÅÈÎ±¾´ÎÌØÕ÷Æ¥Åä
+			matchesinfo.matches.push_back(m0);     //ï¿½ï¿½ï¿½Î±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¥ï¿½ï¿½
 			matches.insert(std::make_pair(m0.queryIdx, m0.trainIdx));
 		}
 	}

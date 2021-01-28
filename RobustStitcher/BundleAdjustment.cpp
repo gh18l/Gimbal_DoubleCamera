@@ -1,7 +1,7 @@
 /**
 @brief BundleAdjustment.h
 C++ source file for bundle adjustment using ceres-solver
-@author Shane Yuan
+@thanks for the original version of Shane Yuan 
 @date Feb 14, 2018
 */
 
@@ -684,9 +684,9 @@ int calib::BundleAdjustment::solve(int focalSetting) {
 
 int calib::BundleAdjustment::refine_BA(std::vector<int>& index, calib::Imagefeature& current_feature, std::vector<calib::Imagefeature>& features,
 						std::vector<calib::Matchesinfo>& current_matchesInfo, std::vector<calib::CameraParams>& cameras,
-				calib::CameraParams& current_para)     //²ÎÊýÀï´æ·ÅµÄÊÇºÍÆ´½ÓÍ¼ÏñÏàÁ¬µÄÍ¼Ïñ×é
+				calib::CameraParams& current_para)     //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Åµï¿½ï¿½Çºï¿½Æ´ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½
 {
-	double cameraParam[99*4];    //Òþ»¼£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡
+	double cameraParam[99*4];    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	cv::SVD svd2;
 	for (size_t i = 0; i < cameras.size(); i++) {
 		svd2(cameras[i].R, cv::SVD::FULL_UV);
@@ -728,17 +728,17 @@ int calib::BundleAdjustment::refine_BA(std::vector<int>& index, calib::Imagefeat
 	// Create residuals for each observation in the bundle adjustment problem. The
 	// parameters for cameras and points are added automatically.
 	ceres::Problem problem;
-	for (size_t edge_idx = 0; edge_idx < connectionNum; edge_idx++) {       //¶ÔÃ¿¶ÔÍ¼Ïñ½øÐÐ´¦Àí
+	for (size_t edge_idx = 0; edge_idx < connectionNum; edge_idx++) {       //ï¿½ï¿½Ã¿ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½
 		/*if (current_matchesInfo[edge_idx].confidence < 1.5)
 			continue;*/
-		if (current_matchesInfo[edge_idx].confidence < 1)   //2.9¸ù¾ÝÍ¼ÏñÖ®¼äµÄÌØÕ÷µãÆ¥Åä¶ÔÊýµÃµ½µÄÍ¼ÏñÖ®¼äµÄÖÃÐÅ¶È
+		if (current_matchesInfo[edge_idx].confidence < 1)   //2.9ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½Ö®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¥ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½Í¼ï¿½ï¿½Ö®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¶ï¿½
 			continue;
 		const calib::Imagefeature& features1 = current_feature;
 		const calib::Imagefeature& features2 = features[index[edge_idx]];
-		const calib::Matchesinfo& matches_info = current_matchesInfo[edge_idx];      //µÚ¼¸¸ö¿ÉÐÅÈÎµÄÍ¼Ïñ¶Ô
+		const calib::Matchesinfo& matches_info = current_matchesInfo[edge_idx];      //ï¿½Ú¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îµï¿½Í¼ï¿½ï¿½ï¿½
 		double focal2 = cameraParam[index[edge_idx] * 4 + 3];
-		for (size_t k = 0; k < matches_info.matches.size(); ++k) {     //¶ÔÃ¿¶ÔÌØÕ÷µã½øÐÐ´¦Àí
-			if (!matches_info.inliers_mask[k])    //ÌØÕ÷¶Ô²»¿ÉÐÅÈÎ
+		for (size_t k = 0; k < matches_info.matches.size(); ++k) {     //ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½
+			if (!matches_info.inliers_mask[k])    //ï¿½ï¿½ï¿½ï¿½ï¿½Ô²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 				continue;
 			const cv::DMatch& m = matches_info.matches[k];
 			cv::Point2f p1 = features1.keypt[m.queryIdx].pt;
@@ -777,7 +777,7 @@ int calib::BundleAdjustment::refine_BA(std::vector<int>& index, calib::Imagefeat
 	Rvec_[0] = current[0];
 	Rvec_[1] = current[1];
 	Rvec_[2] = current[2];
-	ceres::AngleAxisToRotationMatrix(Rvec_, R_1);      //½«Ðý×ªÏòÁ¿×ª»»ÎªÐý×ª¾ØÕó£¬ÓÃÓÚ×îºóµÄÆ´½Ó
+	ceres::AngleAxisToRotationMatrix(Rvec_, R_1);      //ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½Îªï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ´ï¿½ï¿½
 	current_para.R.at<double>(0, 0) = R_1[0];  current_para.R.at<double>(0, 1) = R_1[1];   current_para.R.at<double>(0, 2) = R_1[2];
 	current_para.R.at<double>(1, 0) = R_1[3];  current_para.R.at<double>(1, 1) = R_1[4];   current_para.R.at<double>(1, 2) = R_1[5];
 	current_para.R.at<double>(2, 0) = R_1[6];  current_para.R.at<double>(2, 1) = R_1[7];   current_para.R.at<double>(2, 2) = R_1[8];

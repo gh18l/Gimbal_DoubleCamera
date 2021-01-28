@@ -1,7 +1,7 @@
 /**
 @brief Compositor.h
 C++ head file for compositing images into panorams
-@author Shane Yuan
+@thanks for the original version of Shane Yuan 
 @date Feb 9, 2018
 */
 

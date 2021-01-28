@@ -42,7 +42,7 @@ int findoverlap(cv::Point corner_current, cv::Size size_current, vector<Point>& 
 		cv::Rect temp(corners[i], sizes[i]);
 		if (isOverlap(Rect_current, temp))
 		{
-			index.push_back(i);   //´æ·Å×ÅÏàÁ¬Í¼ÏñµÄÐòºÅ£¬ÓÃ¹ýºó±ðÍüÁËÇå¿Õ
+			index.push_back(i);   //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½Å£ï¿½ï¿½Ã¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		}
 	}
 	return 0;
@@ -59,7 +59,7 @@ int save_para(vector<calib::CameraParams>& cameras, vector<Point>& corners, vect
 	{
 		para << cameras[i].focal << " " << cameras[i].aspect << " "
 			<< cameras[i].ppx << " " << cameras[i].ppy << " ";
-		//¿ÉÒÔ¿¼ÂÇ¿´ÏÂMat_Ä£°åÀà£¬K()constº¯Êý±»¶¨ÒåÔÚcamera.cppÀï
+		//ï¿½ï¿½ï¿½Ô¿ï¿½ï¿½Ç¿ï¿½ï¿½ï¿½Mat_Ä£ï¿½ï¿½ï¿½à£¬K()constï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½camera.cppï¿½ï¿½
 		for (int j = 0; j < 3; j++)
 		{
 			for (int k = 0; k < 3; k++)
@@ -91,7 +91,7 @@ int read_para(vector<calib::CameraParams> &cameras, vector<Point> &corners, vect
 	}
 	string str;
 
-	for (int i = 0; i < Row*Col; i++)   //ÕâÀïÃ»ÓÐ×Ô¶¯¼ÆËãÍ¼Æ¬¸öÊý£¡£¡£¡£¡£¡£¡
+	for (int i = 0; i < Row*Col; i++)   //ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½Í¼Æ¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	{
 		getline(para, str, ' ');
 		cameras[i].focal = stof(str);
@@ -135,20 +135,20 @@ int GetCurrentPara(vector<calib::CameraParams>& cameras, cv::Point2f current_poi
 	cv::Mat focals(Row, Col, CV_64FC1), ppxs(Row, Col, CV_64FC1), ppys(Row, Col, CV_64FC1);
 	int index = 0;
 	//////R and T
-	vector<cv::Mat>Rs(9);   //Ã¿²ã¶ÔÓ¦Ò»¸örÔªËØ, Ã¿²ãÔªËØµÄ¸öÊý¶ÔÓ¦Í¼Æ¬¸öÊý
+	vector<cv::Mat>Rs(9);   //Ã¿ï¿½ï¿½ï¿½Ó¦Ò»ï¿½ï¿½rÔªï¿½ï¿½, Ã¿ï¿½ï¿½Ôªï¿½ØµÄ¸ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦Í¼Æ¬ï¿½ï¿½ï¿½ï¿½
 	for (int i = 0; i < 9; i++)
 	{
 		Rs[i].create(Row, Col, CV_64FC1);
 	}
 	//vector<cv::Mat>Ts(3);
-	for (int i = 0; i < Col; i++)      //´ÓÉÏÍùÏÂ¶ÁÊý¾Ý
+	for (int i = 0; i < Col; i++)      //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¶ï¿½ï¿½ï¿½ï¿½ï¿½
 	{
 		for (int j = 0; j < Row; j++)
 		{
-			focals.at<double>(j, i) = cameras[index].focal;      //µÚjÐÐµÚiÁÐ
+			focals.at<double>(j, i) = cameras[index].focal;      //ï¿½ï¿½jï¿½Ðµï¿½iï¿½ï¿½
 			ppxs.at<double>(j, i) = cameras[index].ppx;
 			ppys.at<double>(j, i) = cameras[index].ppy;
-			////Ã¿ÔËÐÐÒ»×éklÑ­»·´ú±í¾ØÕóÒ»¸öÎ»ÖÃ±»ÌîÉÏ Éî¶ÈÎª9
+			////Ã¿ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½klÑ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Î»ï¿½Ã±ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Îª9
 			for (int k = 0; k < 3; k++)
 			{
 				for (int l = 0; l < 3; l++)
@@ -160,11 +160,11 @@ int GetCurrentPara(vector<calib::CameraParams>& cameras, cv::Point2f current_poi
 		}
 	}
 
-	///////////////ÉÏÃæµÄ×îºó»¹ÊÇÒª¼Óµ½readparaº¯ÊýÀïµÄ
+	///////////////ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Óµï¿½readparaï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	vector<double>value;
-	vector<float>mapx(1, (current_point.x - X_MIN)*1.0 / dX);    //Ä¬ÈÏ×ø±ê´Ó00¿ªÊ¼
-	vector<float>mapy(1, (current_point.y - Y_MIN)*1.0 / dY);    //Ä¬ÈÏ×ø±ê´Ó00¿ªÊ¼
-	remap(focals, value, mapx, mapy, INTER_LINEAR);    //¿ÉÄÜÐèÒªclearÒ»ÏÂ£¬µÃÊµÑé·µ»ØÖµÊÇpush»¹ÊÇ¸²¸Ç
+	vector<float>mapx(1, (current_point.x - X_MIN)*1.0 / dX);    //Ä¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½00ï¿½ï¿½Ê¼
+	vector<float>mapy(1, (current_point.y - Y_MIN)*1.0 / dY);    //Ä¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½00ï¿½ï¿½Ê¼
+	remap(focals, value, mapx, mapy, INTER_LINEAR);    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÒªclearÒ»ï¿½Â£ï¿½ï¿½ï¿½Êµï¿½é·µï¿½ï¿½Öµï¿½ï¿½pushï¿½ï¿½ï¿½Ç¸ï¿½ï¿½ï¿½
 	current_para.focal = value[0];
 	value.clear();
 
@@ -198,7 +198,7 @@ int warp(std::vector<cv::Mat>& imgs)
 	cv::resize(src, src, cv::Size(1000, 750));
 	read_para(cameras, corners, sizes);
 	GetCurrentPara(cameras, cv::Point2f(110.0, 230.0), current_para);
-	/////////Çó³öcorner_currentºÍsize_current///////////////
+	/////////ï¿½ï¿½ï¿½corner_currentï¿½ï¿½size_current///////////////
 	cv::Mat src_warped, mask, mask_warped;
 	cv::Point corner_current;
 	cv::Size size_current;
@@ -218,7 +218,7 @@ int warp(std::vector<cv::Mat>& imgs)
 
 	//calib::Compositor compositor;
 	std::vector<int> index;
-	findoverlap(corner_current, size_current, corners, sizes, index);   //Çó³öcompositor.index
+	findoverlap(corner_current, size_current, corners, sizes, index);   //ï¿½ï¿½ï¿½compositor.index
 	std::cout << index.size() << std::endl;
 
 	//calib::FeatureMatch match;
@@ -228,11 +228,11 @@ int warp(std::vector<cv::Mat>& imgs)
 	std::vector<calib::Matchesinfo> current_matchesInfo(index.size());
 	for (int i = 0; i < index.size(); i++)
 	{
-		match.current_feature_thread_(src, imgs[index[i]], features[i], current_feature, current_matchesInfo[i],i);    //½¨Á¢ÆðÆ´½ÓÍ¼ÏñºÍÖÜÎ§Í¼ÏñµÄÌØÕ÷Æ¥Åä
+		match.current_feature_thread_(src, imgs[index[i]], features[i], current_feature, current_matchesInfo[i],i);    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ´ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½Î§Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¥ï¿½ï¿½
 	}
 	//calib::BundleAdjustment bundleAdjust;
 	calib::BundleAdjustment bundleAdjust;
-	bundleAdjust.refine_BA(index, current_feature, features, current_matchesInfo, cameras, current_para);    //µÃµ½µ±Ç°current_cameraµÄ×¼È·Öµ
+	bundleAdjust.refine_BA(index, current_feature, features, current_matchesInfo, cameras, current_para);    //ï¿½Ãµï¿½ï¿½ï¿½Ç°current_cameraï¿½ï¿½×¼È·Öµ
 	
 	
 	for (int i = 0; i < index.size(); i++)

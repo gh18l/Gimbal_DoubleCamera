@@ -1,7 +1,7 @@
 /**
 @brief BundleAdjustment.h
 C++ head file for bundle adjustment using ceres-solver
-@author Shane Yuan
+@thanks for the original version of Shane Yuan 
 @date Feb 13, 2018
 */
 

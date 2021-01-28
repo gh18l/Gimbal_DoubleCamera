@@ -1,7 +1,7 @@
 /**
 @brief FeatureMatch.h
 C++ head file for feature matching
-@author Shane Yuan
+@thanks for the original version of Shane Yuan 
 @date Jan 30, 2018
 */
 

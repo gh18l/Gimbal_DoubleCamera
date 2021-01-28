@@ -1,7 +1,7 @@
 /**
 @brief Compositor.cpp
 C++ source file for compositing images into panorams
-@author Shane Yuan
+@thanks for the original version of Shane Yuan 
 @date Feb 9, 2018
 */
 
@@ -75,7 +75,7 @@ int calib::Compositor::composite(cv::Mat& panorama) {
 
 int calib::Compositor::single_composite(calib::CameraParams& current_camera, cv::Mat& src, cv::Mat& result, 
 									std::vector<cv::Point> &corners, std::vector<cv::Size>&sizes) {
-	//std::vector<cv::Rect> roiRect(73);    //Òþ»¼£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡
+	//std::vector<cv::Rect> roiRect(73);    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	cv::Mat imgWarped;
 	cv::Mat imgMask;
 	cv::Ptr<cv::detail::SphericalWarper> w = cv::makePtr<cv::detail::SphericalWarper>(false);
@@ -107,10 +107,10 @@ int calib::Compositor::single_composite(calib::CameraParams& current_camera, cv:
 		br.x = std::max(br.x, corners[i].x + sizes[i].width);
 		br.y = std::max(br.y, corners[i].y + sizes[i].height);
 	}
-	cv::Rect pano(tl, br);     //ÕâÀïÓÃcorners¶ø²»ÓÃÊäÈëµÄÈ«¾°Í¼µÄÔ­ÒòÊÇÏëµÃµ½È«¾°Í¼µÄ¾ø¶Ô×ø±ê
+	cv::Rect pano(tl, br);     //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½cornersï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È«ï¿½ï¿½Í¼ï¿½ï¿½Ô­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½È«ï¿½ï¿½Í¼ï¿½Ä¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 	int dx = roi.x - pano.x;
-	int dy = roi.y - pano.y;    //±íÊ¾ÊäÈëÍ¼ÏñÔÚÈ«¾°Í¼ÖÐµÄÏà¶ÔÎ»ÖÃ
+	int dy = roi.y - pano.y;    //ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½È«ï¿½ï¿½Í¼ï¿½Ðµï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
 	cv::Rect roi1(cv::Point(dx, dy), sizes[corners.size() - 1]);
 	imgWarped.copyTo(result(roi1), imgMask);
 

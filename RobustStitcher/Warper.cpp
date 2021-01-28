@@ -1,6 +1,6 @@
 /**
 @brief warper class, warping function
-@author Shane Yuan
+@thanks for the original version of Shane Yuan 
 @date Jun 1, 2017
 */
 
