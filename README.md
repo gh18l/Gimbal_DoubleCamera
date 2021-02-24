@@ -49,4 +49,4 @@ It is easy to check and compile according to the CMakeLists.txt.
 A coarse but worked real-time demo is in **"demo/output.avi"**, there are some problems with online playback temporarily.
 
 ## Reference
-The DoubleCamera system is a low-cost version compared with the [GigaPixel System](http://xiaoyunyuan.net/iccp_giga.html)
+The DoubleCamera system is a low-cost version compared with the [GigaPixel System](http://www.liuyebin.com/gigavideo/gigavideo.html)
